@@ -1,7 +1,8 @@
 name: simpa
+# set explicit label for cuda version to avoid possible mismatch between pytorch-cuda & cuda-nvcc
 channels:
   - pytorch
-  - nvidia
+  - nvidia/label/cuda-11.7.1
   - conda-forge
   - defaults
 dependencies:
@@ -27,8 +28,8 @@ dependencies:
   - requests
   - wget
 # simpa dependencies not on conda-forge:
-#  - pacfish>=0.4.4
-#  - jdata>=0.5.2
+#  - pacfish
+#  - jdata
 # nvcc to compile mcx:
   - cuda-libraries-dev
   - cuda-nvcc
