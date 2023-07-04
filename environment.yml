@@ -1,0 +1,36 @@
+name: simpa
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+  - defaults
+dependencies:
+# simpa needs python <3.11:
+  - python==3.10
+# simpa needs pytorch:
+  - pytorch
+  - pytorch-cuda
+  - torchvision
+  - torchaudio
+# other simpa dependencies:
+  - matplotlib
+  - numpy
+  - scipy
+  - pynrrd
+  - scikit-image
+  - xmltodict
+  - h5py
+  - pandas
+  - coverage
+  - deprecated
+  - python-dotenv
+  - requests
+  - wget
+# simpa dependencies not on conda-forge:
+#  - pacfish>=0.4.4
+#  - jdata>=0.5.2
+# nvcc to compile mcx:
+  - cuda-libraries-dev
+  - cuda-nvcc
+  - cuda-nvtx
+  - cuda-cupti
