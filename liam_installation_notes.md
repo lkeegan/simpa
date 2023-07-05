@@ -28,6 +28,8 @@ To run mcx using libs from conda env also need to set `LD_LIBRARY_PATH` at runti
 LD_LIBRARY_PATH=$CONDA_PREFIX/lib ldd ../bin/mcx
 ```
 
+But there are also compatible system cuda libs available so it runs ok without this
+
 ## k-wave
 
 Download and extract k-wave toolbox. Also download pre-compiled binaries,
@@ -82,7 +84,7 @@ Now can build, by default all libs statically linked apart from cuda ones:
 make CUDA_DIR=$CONDA_PREFIX EBROOTHDF5=/export/home/lkeegan/hdf5 EBROOTZLIB=/export/home/lkeegan SZIP_DIR=/export/home/lkeegan
 ```
 
-Note: will again need to modify LD_LIBRARY_PATH at runtime to pick up cuda libs from conda (but may also work with system libs):
+Note: again need to modify LD_LIBRARY_PATH at runtime to pick up cuda libs from conda (but also workd with system cuda libs):
 
 ```
 LD_LIBRARY_PATH=$CONDA_PREFIX/lib ./kspaceFirstOrder-CUDA --version
@@ -100,8 +102,8 @@ MATLAB_BINARY_PATH=/usr/local/bin/matlab
 
 ## run examples
 
-e.g.
+Use `CUDA_VISIBLE_DEVICES` to control which gpu is used, e.g.
 
 ```
-python simpa_examples/minimal_optical_simulation.py
+CUDA_VISIBLE_DEVICES=1 python simpa_examples/minimal_optical_simulation.py
 ```
