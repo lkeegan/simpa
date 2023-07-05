@@ -107,3 +107,21 @@ Use `CUDA_VISIBLE_DEVICES` to control which gpu is used, e.g.
 ```
 CUDA_VISIBLE_DEVICES=1 python simpa_examples/minimal_optical_simulation.py
 ```
+
+## function level profiling
+
+install snakeviz, then
+
+```
+CUDA_VISIBLE_DEVICES=1 python -m cProfile -o msot.prof simpa_examples/msot_invision_simulation.py
+snakeviz msot.prof
+```
+
+## line level profiling
+
+install line_profiler, add `@profile` decorator to functions that should be profiled, then
+
+```
+CUDA_VISIBLE_DEVICES=1 python -m kernprof -l simpa_examples/msot_invision_simulation.py
+python -m line_profiler msot_invision_simulation.py.lprof
+```
