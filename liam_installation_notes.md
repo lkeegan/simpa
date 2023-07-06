@@ -125,3 +125,20 @@ install line_profiler, add `@profile` decorator to functions that should be prof
 CUDA_VISIBLE_DEVICES=1 python -m kernprof -l simpa_examples/msot_invision_simulation.py
 python -m line_profiler msot_invision_simulation.py.lprof
 ```
+
+# application level memory profiling
+
+install memory_profiler, then
+
+```
+CUDA_VISIBLE_DEVICES=1 mprof run python simpa_examples/msot_invision_simulation.py
+mprof plot
+```
+
+# line level memory profiling
+
+install memory_profiler, add `@profile` decorator to functions that should be profiled, then
+
+```
+CUDA_VISIBLE_DEVICES=1 python -m memory_profiler simpa_examples/msot_invision_simulation.py
+```
