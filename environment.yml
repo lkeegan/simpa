@@ -35,3 +35,6 @@ dependencies:
   - cuda-nvcc
   - cuda-nvtx
   - cuda-cupti
+# benchmarking dependencies
+  - line_profiler
+  - memory_profiler

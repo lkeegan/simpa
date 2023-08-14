@@ -221,7 +221,7 @@ class MCXAdapter(OpticalForwardModuleBase):
             self.global_settings[Tags.VOLUME_NAME] + ".bin"
         self.temporary_output_files.append(tmp_input_path)
         # numpy tofile writes in 'C' order, so writing the transpose gives Fortran order
-        op_array.T.tofile(tmp_input_path)
+        op_array.flatten(order='F').tofile(tmp_input_path)
 
     def read_mcx_output(self, **kwargs) -> Dict:
         """
