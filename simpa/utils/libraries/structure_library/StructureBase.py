@@ -5,6 +5,7 @@
 from abc import abstractmethod
 
 import numpy as np
+import torch
 
 from simpa.log import Logger
 from simpa.utils import Settings, Tags, get_functional_from_deformation_settings
