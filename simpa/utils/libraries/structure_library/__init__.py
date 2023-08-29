@@ -4,6 +4,7 @@
 
 import operator
 import traceback
+import torch
 
 from simpa.log import Logger
 from simpa.utils import Settings, Tags
@@ -51,6 +52,7 @@ class Structures:
                 structure_class = globals()[single_structure_settings[Tags.STRUCTURE_TYPE]]
                 structure = structure_class(global_settings, single_structure_settings)
                 structures.append(structure)
+                torch.cuda.empty_cache()
             except Exception as e:
                 self.logger.critical("An exception has occurred while trying to parse " +
                                      str(single_structure_settings[Tags.STRUCTURE_TYPE]) +
