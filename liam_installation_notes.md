@@ -142,3 +142,10 @@ install memory_profiler, add `@profile` decorator to functions that should be pr
 ```
 CUDA_VISIBLE_DEVICES=1 python -m memory_profiler simpa_examples/msot_invision_simulation.py
 ```
+
+# line level gpu memory profiling
+
+`pip install pytorch_memlab`,
+add `@profile` decorator to functions that should be profiled,
+and `from pytorch_memlab import profile` to these files,
+then run as normal, gpu memory use for each line will be displayed in console at the end.
