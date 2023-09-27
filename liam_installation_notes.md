@@ -75,19 +75,19 @@ edit `kspaceFirstOrder-CUDA/Makefile`:
 
 - replace spaces with tabs for last few items if make "missing separator" error occurs
 - remove < sm_52, add sm_80, sm_86 to archs
+- set LINKING=STATIC
+- fix /lib64 cuda paths to /lib
 
 Then copy system static libz.a and libsz.a libs (`whereis libz.a`) to /export/home/lkeegan/lib/.
 
-Now can build, by default all libs statically linked apart from cuda ones:
+Now can build with all libs statically linked:
 
 ```
 make CUDA_DIR=$CONDA_PREFIX EBROOTHDF5=/export/home/lkeegan/hdf5 EBROOTZLIB=/export/home/lkeegan SZIP_DIR=/export/home/lkeegan
 ```
 
-Note: again need to modify LD_LIBRARY_PATH at runtime to pick up cuda libs from conda (but also workd with system cuda libs):
-
 ```
-LD_LIBRARY_PATH=$CONDA_PREFIX/lib ./kspaceFirstOrder-CUDA --version
+./kspaceFirstOrder-CUDA --version
 ```
 
 ## path config
