@@ -4,6 +4,7 @@
 import numpy as np
 from collections.abc import Iterable
 from typing import Tuple, Dict, Union
+import os
 
 from simpa.utils import Tags, Settings
 from simpa.core.simulation_modules.optical_simulation_module.optical_forward_model_mcx_adapter import MCXAdapter
@@ -16,8 +17,8 @@ class MCXAdapterReflectance(MCXAdapter):
     This class implements the capability to run diffuse reflectance simulations.
 
     .. warning::
-        This MCX adapter requires a version of MCX containing the revision: `Rev::077060`, which was published in the
-        Nightly build  on `2022-01-26`.
+        This MCX adapter requires a version of MCX containing the commit 56eca8ae7e9abde309053759d6d6273ac4795fc5,
+        which was published in the Nightly build on `2024-03-10`.
 
     .. note::
         MCX is a GPU-enabled Monte-Carlo model simulation of photon transport in tissue:
@@ -56,10 +57,11 @@ class MCXAdapterReflectance(MCXAdapter):
                        absorption_cm: np.ndarray,
                        scattering_cm: np.ndarray,
                        anisotropy: np.ndarray,
-                       assumed_anisotropy: np.ndarray,
+                       refractive_index: np.ndarray,
                        **kwargs) -> Dict:
         config = super(MCXAdapterReflectance, self).get_mcx_config(illumination_geometry,
-                                                                   absorption_cm, scattering_cm, anisotropy, assumed_anisotropy, **kwargs)
+                                                                   absorption_cm, scattering_cm, anisotropy,
+                                                                   refractive_index, **kwargs)
         if Tags.COMPUTE_PHOTON_DIRECTION_AT_EXIT in self.component_settings and \
                 self.component_settings[Tags.COMPUTE_PHOTON_DIRECTION_AT_EXIT]:
             config["issavedet"] = 1
@@ -76,8 +78,8 @@ class MCXAdapterReflectance(MCXAdapter):
         """
         pre-process volumes before running simulations with MCX. The volumes are transformed to `mm` units and pads
         a 0-values layer along the z-axis in order to save diffuse reflectance values. All 0-valued voxels are then
+        transformed to `np.nan`. This last transformation `0->np.nan` is a requirement form MCX.
         transformed to `np.nan`. This last transformation `0->np.nan` is a requirement from MCX.
-
         :param kwargs: dictionary containing at least the keys `scattering_cm, absorption_cm, anisotropy` and
             `assumed_anisotropy`
         :return: `Tuple` of volumes after transformation
@@ -102,9 +104,10 @@ class MCXAdapterReflectance(MCXAdapter):
 
     def post_process_volumes(self, **kwargs):
         """
+        post-processes volumes after MCX simulations. Dummy function implemented for compatibility with inherited
+        classes. Removes layer padded by `self.pre_process_volumes` if it was added and transforms `np.nan -> 0`.
         post-processes volumes after MCX simulations.
         Removes layer padded by `self.pre_process_volumes` if it was added and transforms `np.nan -> 0`.
-
         :param kwargs: dictionary containing at least the key `volumes` to be transformed
         :return:
         """
@@ -115,6 +118,7 @@ class MCXAdapterReflectance(MCXAdapter):
             results = tuple(arrays)
         for a in results:
             # revert nan transformation that was done while pre-processing volumes
+            a[np.isnan(a)] = 0.
             a[np.isnan(a)] = 0
         return results
 
@@ -123,11 +127,11 @@ class MCXAdapterReflectance(MCXAdapter):
                           device: Union[IlluminationGeometryBase, PhotoacousticDevice],
                           absorption: np.ndarray,
                           scattering: np.ndarray,
-                          anisotropy: np.ndarray
+                          anisotropy: np.ndarray,
+                          refractive_index: np.ndarray
                           ) -> Dict:
         """
         runs `self.forward_model` as many times as defined by `device` and aggregates the results.
-
         :param _device: device illumination geometry
         :param device: class defining illumination
         :param absorption: Absorption volume
@@ -156,7 +160,6 @@ class MCXAdapterReflectance(MCXAdapter):
             if Tags.DATA_FIELD_PHOTON_EXIT_POS in results:
                 photon_position.append(results[Tags.DATA_FIELD_PHOTON_EXIT_POS])
                 photon_direction.append(results[Tags.DATA_FIELD_PHOTON_EXIT_DIR])
-
         aggregated_results = dict()
         aggregated_results[Tags.DATA_FIELD_FLUENCE] = fluence / len(_devices)
         if reflectance:

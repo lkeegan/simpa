@@ -37,6 +37,7 @@ class OpticalForwardModuleBase(SimulationModule):
                       absorption_cm: np.ndarray,
                       scattering_cm: np.ndarray,
                       anisotropy: np.ndarray,
+                      refractive_index: np.ndarray,
                       illumination_geometry: IlluminationGeometryBase):
         """
         A deriving class needs to implement this method according to its model.
@@ -44,6 +45,7 @@ class OpticalForwardModuleBase(SimulationModule):
         :param absorption_cm: Absorption in units of per centimeter
         :param scattering_cm: Scattering in units of per centimeter
         :param anisotropy: Dimensionless scattering anisotropy
+        :param refractive_index: Refractive index
         :param illumination_geometry: A device that represents a detection geometry
         :return: Fluence in units of J/cm^2
         """
@@ -66,6 +68,7 @@ class OpticalForwardModuleBase(SimulationModule):
         absorption = load_data_field(file_path, Tags.DATA_FIELD_ABSORPTION_PER_CM, wl)
         scattering = load_data_field(file_path, Tags.DATA_FIELD_SCATTERING_PER_CM, wl)
         anisotropy = load_data_field(file_path, Tags.DATA_FIELD_ANISOTROPY, wl)
+        refractive_index = load_data_field(file_path, Tags.DATA_FIELD_REFRACTIVE_INDEX, wl)
         gruneisen_parameter = load_data_field(file_path, Tags.DATA_FIELD_GRUNEISEN_PARAMETER)
 
         _device = None
@@ -80,7 +83,8 @@ class OpticalForwardModuleBase(SimulationModule):
                                          device=device,
                                          absorption=absorption,
                                          scattering=scattering,
-                                         anisotropy=anisotropy)
+                                         anisotropy=anisotropy,
+                                         refractive_index=refractive_index)
         fluence = results[Tags.DATA_FIELD_FLUENCE]
         if not (Tags.IGNORE_QA_ASSERTIONS in self.global_settings and Tags.IGNORE_QA_ASSERTIONS):
             assert_array_well_defined(fluence, assume_non_negativity=True, array_name="fluence")
@@ -115,7 +119,8 @@ class OpticalForwardModuleBase(SimulationModule):
                           device: Union[IlluminationGeometryBase, PhotoacousticDevice],
                           absorption: np.ndarray,
                           scattering: np.ndarray,
-                          anisotropy: np.ndarray) -> Dict:
+                          anisotropy: np.ndarray,
+                          refractive_index: np.ndarray) -> Dict:
         """
         runs `self.forward_model` as many times as defined by `device` and aggregates the results.
 
@@ -124,12 +129,14 @@ class OpticalForwardModuleBase(SimulationModule):
         :param absorption: Absorption volume
         :param scattering: Scattering volume
         :param anisotropy: Dimensionless scattering anisotropy
+        :param refractive_index: Refractive index
         :return:
         """
         _devices = _device if isinstance(_device, Iterable) else (_device,)
         fluence = sum(self.forward_model(absorption_cm=absorption,
                                          scattering_cm=scattering,
                                          anisotropy=anisotropy,
+                                         refractive_index=refractive_index,
                                          illumination_geometry=illumination_geometry)[Tags.DATA_FIELD_FLUENCE]
                       for illumination_geometry in _devices)
         return {Tags.DATA_FIELD_FLUENCE: fluence / len(_devices)}
