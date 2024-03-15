@@ -97,7 +97,7 @@ class MCXAdapter(OpticalForwardModuleBase):
                                                                                                  'refractive_index': refractive_index})
         # stack arrays to give array with shape (nx,ny,nz,4) - where the 4 floats correspond to mua/mus/g/n
         vol = np.stack([absorption_mm, scattering_mm, anisotropy, refractive_index], dtype=np.float32)
-        [self.nx, self.ny, self.nz, _] = np.shape(vol)
+        [_, self.nx, self.ny, self.nz] = np.shape(vol)
         source = illumination_geometry.get_mcx_illuminator_definition(self.global_settings)
         prop = np.array([[0, 0, 1, 1]], dtype=np.float32)
         if Tags.TIME_STEP and Tags.TOTAL_TIME in self.component_settings:
@@ -120,7 +120,7 @@ class MCXAdapter(OpticalForwardModuleBase):
             "srcdir": source["Dir"],
             "srcparam1": source["Param1"],
             "srcparam2": source["Param2"],
-            "isreflect": 0,
+            "isreflect": 1,
             "autopilot": 1,
             "outputtype": "fluence",
         }
